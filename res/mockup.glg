@@ -1,0 +1,23 @@
+print hello\n\tjlkdfj\n
+
+
+set var1, 10
+print started\n
+set var2, 10
+
+print a
+#IF1:
+if $var1, >=,   0,          9
+    op $var1, -, 1
+    
+
+    
+    
+
+    goto IF1
+
+
+
+
+print \nfinished\n
+
