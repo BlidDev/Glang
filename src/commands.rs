@@ -133,6 +133,10 @@ pub fn if_keyword(globals : &mut Globals, _args: Args)
      if statement(&first, &second, &op)
      {
           globals.cursor+=1;
+          for i in globals.cursor..globals.cursor+range
+          {
+               //println!("{}:{:?}",i, globals.commands[i]);
+          }
           for _ in globals.cursor..globals.cursor+range-1
           {
               // println!("{}",globals.cursor);
@@ -148,7 +152,7 @@ pub fn if_keyword(globals : &mut Globals, _args: Args)
           }
      }
      else {
-         globals.cursor += range;
+         globals.cursor += range + 1;
      }
 }
 

@@ -22,6 +22,7 @@ pub fn add_command(query: &mut Query, name: &str, command: fn(&mut Globals, Args
 }
 
 pub fn run(globals: &mut Globals, name: &str, args: Args) {
+    //println!("{{{}}}",globals.cursor);
     globals.query
         .get(name)
         .expect(&format!("ERR: function [{}] does not exist", &name))(globals, args);

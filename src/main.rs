@@ -63,11 +63,13 @@ fn main() {
         }
         counter+=1;
     }
-    println!("{} {:?}",globals.commands.len(),globals.labels);
+    //println!("{} {:?}",globals.commands.len(),globals.labels);
     
+    let mut c =0;
      for i in globals.commands.iter()
      {
-         println!("{:?}", i)
+         //println!("{}:{:?}", c ,i);
+         c+=1;
      }
 
     while globals.cursor != usize::MAX && globals.cursor < globals.commands.len()
