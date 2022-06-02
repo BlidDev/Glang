@@ -17,6 +17,7 @@ fn main() {
         stack  : Stack::new(),
         labels  : HashMap::new(),
         cursor : 0,
+        graphics : Graphics::default()
     };
     
     add_command(&mut globals.query, "alive", alive);
@@ -63,15 +64,9 @@ fn main() {
         }
         counter+=1;
     }
-    //println!("{} {:?}",globals.commands.len(),globals.labels);
     
-    let mut c =0;
-     for i in globals.commands.iter()
-     {
-         //println!("{}:{:?}", c ,i);
-         c+=1;
-     }
-
+    
+    
     while globals.cursor != usize::MAX && globals.cursor < globals.commands.len()
     {
         let command = &globals.commands[globals.cursor].clone();

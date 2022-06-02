@@ -1,15 +1,51 @@
-use std::{collections::HashMap, mem::discriminant};
+use sdl2::{
+    pixels::{PixelFormat, PixelFormatEnum},
+    render::{Canvas, Texture, TextureCreator},
+    video::{Window, WindowContext},
+    EventPump, Sdl, VideoSubsystem,
+};
+use std::{collections::HashMap, mem::discriminant, rc::Rc, sync::Mutex};
 
 pub type Args = Option<Vec<String>>;
-pub type Query = HashMap<String, fn(&mut Globals, Args)>;
+pub type Query<'a> = HashMap<String, fn(&mut Globals<'a>, Args)>;
 pub type Stack = HashMap<String, Types>;
 
-pub struct Globals {
-    pub query : Query,
-    pub commands : Vec<Vec<String>>,
+pub struct Graphics<'a> {
+    pub is_inited: bool,
+    pub w: u32,
+    pub h: u32,
+    pub screen: Vec<u8>,
+    pub sdl_context: Option<Sdl>,
+    pub video_subsystem: Option<VideoSubsystem>,
+    pub texture_creator: Option<TextureCreator<WindowContext>>,
+    pub canvas: Option<Canvas<Window>>,
+    pub texture: Option<Texture<'a>>,
+}
+
+impl<'a> Default for Graphics<'a>{
+    fn default() -> Self {
+        Graphics {
+            is_inited: false,
+            w: 848,
+            h: 480,
+            screen: vec![0; 848 * 480 * 3],
+            sdl_context: None,
+            video_subsystem: None,
+            texture_creator: None,
+
+            canvas: None,
+            texture: None,
+        }
+    }
+}
+
+pub struct Globals<'a> {
+    pub query: Query<'a>,
+    pub commands: Vec<Vec<String>>,
     pub stack: Stack,
     pub labels: HashMap<String, usize>,
     pub cursor: usize,
+    pub graphics: Graphics<'a>,
 }
 
 pub fn add_command(query: &mut Query, name: &str, command: fn(&mut Globals, Args)) {
@@ -23,7 +59,8 @@ pub fn add_command(query: &mut Query, name: &str, command: fn(&mut Globals, Args
 
 pub fn run(globals: &mut Globals, name: &str, args: Args) {
     //println!("{{{}}}",globals.cursor);
-    globals.query
+    globals
+        .query
         .get(name)
         .expect(&format!("ERR: function [{}] does not exist", &name))(globals, args);
 }
@@ -45,8 +82,7 @@ pub fn string_to_command(lines: &mut Vec<Vec<String>>, command: &String) {
         } else {
             lines.push(vec![command.trim().to_string()])
         }
-    }
-    else {
+    } else {
         lines.push(vec![])
     }
 }
@@ -100,16 +136,15 @@ pub fn get_var_e(stack: &Stack, value: &str, kind: &Types) -> Types {
     }
 }
 
-pub fn get_var(stack: &Stack, value: &str) -> Types 
-{
+pub fn get_var(stack: &Stack, value: &str) -> Types {
     if is_variable(&value) {
         let name = value[1..].to_string();
         return stack
             .get(&name)
-            .expect(&format!("ERR: Variable [{}], does not exist", name)).clone();
-    } 
-    else {
-        return  parse_variable(&value);
+            .expect(&format!("ERR: Variable [{}], does not exist", name))
+            .clone();
+    } else {
+        return parse_variable(&value);
     }
 }
 
