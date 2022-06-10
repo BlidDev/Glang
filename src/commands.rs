@@ -1,7 +1,6 @@
-use std::{mem::discriminant, rc::Rc, sync::Mutex};
+use std::mem::discriminant;
 
-use crate::memory::{get_var_e, Args, Globals,is_variable, parse_variable, Types, get_var, run};
-use sdl2::{video::Window, pixels::PixelFormatEnum, render::TextureAccess};
+use crate::memory::{Args, Globals,is_variable, parse_variable, Types, get_var, run};
 use unescape::unescape;
 
 pub fn alive(_: &mut Globals, _: Args) {
@@ -186,10 +185,11 @@ pub fn op(globals : &mut Globals, _args : Args)
 
 // init name,3,3
 
-pub fn put(globals : &mut Globals, args : Args)
+pub fn put(_globals : &mut Globals, _args : Args)
 {
 
 }
+/*
 pub fn area(globals : &mut Globals, args : Args)
 {
 
@@ -207,5 +207,5 @@ pub fn clear(globals : &mut Globals, args : Args)
 
 }
 
-
+*/
 

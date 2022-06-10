@@ -1,19 +1,21 @@
 
-use std::{collections::HashMap, mem::discriminant, rc::Rc, sync::Mutex};
+use std::{collections::HashMap, mem::discriminant};
+
+use crate::graphics::Graphics;
 
 
 pub type Args = Option<Vec<String>>;
-pub type Query<'a> = HashMap<String, fn(&mut Globals<'a>, Args)>;
+pub type Query = HashMap<String, fn(&mut Globals, Args)>;
 pub type Stack = HashMap<String, Types>;
 
 
-pub struct Globals<'a> {
-    pub query: Query<'a>,
+pub struct Globals {
+    pub query: Query,
     pub commands: Vec<Vec<String>>,
     pub stack: Stack,
     pub labels: HashMap<String, usize>,
     pub cursor: usize,
-    
+    pub graphics : Graphics
 }
 
 pub fn add_command(query: &mut Query, name: &str, command: fn(&mut Globals, Args)) {
@@ -69,7 +71,7 @@ pub fn is_variable(value: &str) -> bool {
     return chars[0] == '$';
 }
 
-pub fn get_var_e(stack: &Stack, value: &str, kind: &Types) -> Types {
+pub fn _get_var_e(stack: &Stack, value: &str, kind: &Types) -> Types {
     if is_variable(value)
     //is variable
     {

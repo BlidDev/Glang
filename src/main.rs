@@ -4,25 +4,15 @@ mod memory;
 use commands::*;
 use memory::*;
 use graphics::*;
-use sdl2::pixels::PixelFormatEnum;
-use sdl2::render::Texture;
-use sdl2::pixels::Color;
 use core::panic;
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
-use std::rc::Rc;
-use std::sync::Mutex;
 
 
 
 
-thread_local! 
-{
-     pub static GRAPHICS : RefCell<Graphics<'static,'static>> = RefCell::new(Graphics::default());
-    //pub static TEXTURE : RefCell<Option<Texture<'static>>>  = RefCell::new(None);
-}
+
 
 fn main() {
     let mut globals = Globals
@@ -32,7 +22,7 @@ fn main() {
         stack  : Stack::new(),
         labels  : HashMap::new(),
         cursor : 0,
-        //graphics : Graphics::default()
+        graphics : Graphics::default()
     };
     
     add_command(&mut globals.query, "alive", alive);
@@ -47,16 +37,8 @@ fn main() {
     let file = File::open("res/mockup.glg").unwrap();
     let reader = BufReader::new(file);
 
-    
-   
-    GRAPHICS.with(|g|{
-
-        *g.borrow_mut() = Graphics::new("Test",848,480,250,250).unwrap();
-        let tc = g.borrow().texture_creator.as_ref().unwrap().create_texture_streaming(PixelFormatEnum::RGB24, 250,250).unwrap();
-        g.borrow_mut().texture = Some(&tc);
-    });
-    //g.create_texture(&mut g.texture_creator.unwrap(),250, 250);
-    
+    let mut graphics = Graphics::default();
+ 
   
     let mut counter = 0;
     for line in reader.lines() 
