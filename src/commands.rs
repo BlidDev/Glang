@@ -1,6 +1,6 @@
 use std::{mem::discriminant, rc::Rc, sync::Mutex};
 
-use crate::memory::{get_var_e, Args, Globals,is_variable, parse_variable, Types, get_var, run, Graphics};
+use crate::memory::{get_var_e, Args, Globals,is_variable, parse_variable, Types, get_var, run};
 use sdl2::{video::Window, pixels::PixelFormatEnum, render::TextureAccess};
 use unescape::unescape;
 
@@ -185,35 +185,7 @@ pub fn op(globals : &mut Globals, _args : Args)
 
 
 // init name,3,3
-pub fn init<'a>(globals : &'a mut Globals<'a>, _args : Args)
-{
-     let args = _args.unwrap().clone();
-     let mut name : String = "".to_string();
-     let (mut width, mut height) = (0u32,0u32);
-     if let (Types::STR(n), Types::I32(w), Types::I32(h)) = 
-            (get_var(&globals.stack, &args[0]),get_var(&globals.stack, &args[1]),get_var(&globals.stack, &args[2]) )
-     {
-          name = n;
-          width = w as u32;
-          height = h as u32;
-     }
-     let g  = &mut globals.graphics;
-     g.sdl_context = Some(sdl2::init().expect("ERR: Could not init SDL"));
-     g.video_subsystem = Some(g.sdl_context.as_ref().unwrap().video().unwrap());
-     g.w = width; g.h = height;
-     
-     g.screen = vec![0; (width * height * 3) as usize];
-     
-     let window = g.video_subsystem.as_ref().unwrap().window(&name, width, height).vulkan().position_centered().resizable().build().unwrap();
-     let canvas = window.into_canvas().accelerated().build().unwrap();
-      
-     
-     g.texture_creator = Some(canvas.texture_creator());
-     let texture = g.texture_creator.as_ref().unwrap().create_texture_static(PixelFormatEnum::RGB24,width, height).unwrap();
 
-     g.canvas = Some(canvas);
-     g.texture = Some(texture);
-}
 pub fn put(globals : &mut Globals, args : Args)
 {
 
