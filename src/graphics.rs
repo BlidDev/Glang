@@ -1,17 +1,22 @@
 use pixels::{Pixels, SurfaceTexture};
 use winit::{window::{Window, WindowBuilder}, dpi::LogicalSize, event_loop::EventLoop};
+use std::{rc::Rc, sync::Mutex,cell::RefCell};
 
 pub struct Graphics {
+    pub is_inited : bool,
     pub window_size: (usize, usize),
     pub canvas_size: (usize, usize),
     pub window: Option<Window>,
     pub pixels: Option<Pixels>,
+    
     pub event_loop : Option<EventLoop<()>>
 }
 
 impl Graphics {
     pub fn default() -> Self {
+        
         Graphics {
+            is_inited : false,
             window_size: (848, 480),
             canvas_size: (212, 120),
             window: None,
@@ -24,6 +29,7 @@ impl Graphics {
     {
         self.event_loop = Some(EventLoop::new());
         self.window = Some({
+
             
             let size = LogicalSize::new(window_size.0 as f64, window_size.1 as f64);
             WindowBuilder::new()
@@ -39,5 +45,6 @@ impl Graphics {
             Pixels::new(canvas_size.0 as u32, canvas_size.1 as u32, surface_texture).unwrap()
         });
         
+        self.is_inited = true;
     }
 }

@@ -2,18 +2,40 @@ print hello\tjlkdfj
 
 
 set var1, 10
+set var2, 10
+set var3, 0
 print started
 
+init hello glang, 848, 480, 212, 120
+#FILL:
+if $var3, <, $var2, 5
+    put $var3, $var3, 45656
+
+    op $var3, +, 1
+    
+    goto FILL
+
+
+
+
+
+
+
+
+print ====================
 #IF1:
 if $var1, >,   0,          9
-    op $var1, -, 1
-    set var2, 10
-    op $var2, - , $var1
-    print This ran:
-    out $var2
-    print times
-
+    //op $var1, -, 1
+    //set var2, 10
+    //op $var2, - , $var1
+    //print This ran:
+    //out $var2
+    //print times
+    display
+    out $var1
     goto IF1
+
+
 
 
 
