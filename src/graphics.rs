@@ -1,91 +1,62 @@
-use std::sync::Arc;
+use pixels::{Pixels, SurfaceTexture};
 
-use sdl2::{
-    pixels::{PixelFormat, PixelFormatEnum},
-    render::{Canvas, Texture, TextureCreator},
-    video::{Window, WindowContext},
-    EventPump, Sdl, VideoSubsystem,
+use beryllium::{
+    init::{InitFlags, Sdl},
+    vk_window::VkWindow, window::WindowFlags,
 };
+use zstring::zstr;
 
-pub struct Graphics<'a,'b> {
+pub struct Graphics {
     pub is_inited: bool,
-    pub w: u32,
-    pub h: u32,
-    pub screen: Vec<u8>,
+    pub window_size: (i32, i32),
+    pub canvas_size: (u32, u32),
     pub sdl_context: Option<Sdl>,
-    pub video_subsystem: Option<VideoSubsystem>,
-    pub texture_creator: Option<TextureCreator<WindowContext>>,
-    pub canvas: Option<Canvas<Window>>,
-
-    pub texture: Option<&'b Texture<'a>>,
+    pub window: Option<VkWindow>,
+    pub pixels: Option<Pixels>,
+    pub cleanup_buffer : Vec<u8>,
 }
 
-impl<'a,'b> Graphics<'a,'b> {
+impl Graphics {
     pub fn default() -> Self {
         Graphics {
             is_inited: false,
-            w: 848,
-            h: 480,
-            screen: vec![0; 848 * 480 * 3],
+            window_size: (848, 480),
+            canvas_size: (212, 120),
             sdl_context: None,
-            video_subsystem: None,
-            texture_creator: None,
-            canvas: None,
-            texture: None,
+            window: None,
+            pixels: None,
+            cleanup_buffer : vec![],
         }
     }
 
-    pub fn new(
-        title: &str,
-        width: usize,
-        height: usize,
-        canvas_w: usize,
-        canvas_h: usize,
-    ) -> Result<Self, String> {
-        let sdl_context = sdl2::init()?;
-        let video_subsystem = sdl_context.video()?;
-        let window = video_subsystem
-            .window(title, width as u32, height as u32)
-            .vulkan()
-            .position_centered()
-            .build()
-            .map_err(|e| e.to_string())?;
-
-        let canvas = window
-            .into_canvas()
-            .accelerated()
-            .build()
-            .map_err(|e| e.to_string())?;
-
-        let texture_creator = canvas.texture_creator();
-
-        let mut g = Graphics {
-            is_inited: false,
-            w: canvas_w as u32,
-            h: canvas_h as u32,
-            screen: vec![0; canvas_w * canvas_h * 3],
-            sdl_context: Some(sdl_context),
-            video_subsystem: Some(video_subsystem),
-            texture_creator: Some(texture_creator),
-            canvas: Some(canvas),
-            texture: None, //texture: Some(texture),
-        };
-
-        // let texture  = g.texture_creator
-                // .as_ref()
-                // .unwrap()
-                // .create_texture_streaming(PixelFormatEnum::RGB24, width as u32, height as u32)
-                // .unwrap();
+    pub fn init(&mut self, window_size: (i32, i32), canvas_size: (u32, u32)) -> Result<&mut Self, Box<dyn std::error::Error>> {
+        self.window_size = window_size;
+        self.canvas_size = canvas_size;
+        self.cleanup_buffer = vec![0u8; (canvas_size.0 * canvas_size.1 * 4) as usize];
+        for pixel in self.cleanup_buffer.chunks_exact_mut(4) {
+            pixel.copy_from_slice(&[0u8,0u8,0u8,255u8]);
+        }
+        self.sdl_context = Some(Sdl::init(InitFlags::EVERYTHING)?);
         
-        //g.create_texture(canvas_w, canvas_h);
-
-        Ok(g)
-    }
-    pub fn test(&'static mut self)
-    {
-        println!("{} {}",self.w,self.h)
-    }
-    pub fn create_texture(&mut self,tc : &'b mut TextureCreator<WindowContext>,width: usize, height: usize) {
-       //self.texture = Some(&tc.create_texture_streaming(PixelFormatEnum::RGB24, width as u32, height as u32).unwrap());
+        self.window = Some(self.sdl_context.as_ref().unwrap().create_vk_window(
+            //ZStr::from_non_null_unchecked(NonNull::new(title.as_mut_ptr()).unwrap()),
+            zstr!("Glang Window"),
+            None,
+            self.window_size,
+            WindowFlags::ALLOW_HIGHDPI | WindowFlags::RESIZABLE | WindowFlags::VULKAN,
+        )?);
+        
+        self.pixels = Some(
+            {
+                let window = self.window.as_ref().unwrap();
+                let surface_texture = SurfaceTexture::new(self.canvas_size.0, self.canvas_size.1, &**window);
+                Pixels::new(self.canvas_size.0, self.canvas_size.1, surface_texture)?
+            }
+            
+        );
+        self.pixels.as_mut().unwrap().resize_surface(self.window_size.0 as u32, self.window_size.1 as u32);
+        
+        self.is_inited = true;
+        Ok(self)
     }
 }
