@@ -2,6 +2,7 @@ mod graphics;
 mod commands;
 mod memory;
 use commands::*;
+use device_query::DeviceState;
 use memory::*;
 use graphics::*;
 use core::panic;
@@ -13,48 +14,45 @@ use std::io::{prelude::*, BufReader};
 
 
 
-
 fn main() {
     let mut globals = Globals
     {
         query : Query::new(),
+        arg_numbers : HashMap::new(),
         commands : vec![],
         stack  : Stack::new(),
         labels  : HashMap::new(),
         cursor : 0,
-        graphics : Graphics::default()
+        graphics : Graphics::default(),
+        keyboard : DeviceState::new(),
+        keys : vec![]
     };
-    //std::env::set_var("RUST_BACKTRACE", "1");
-    add_command(&mut globals.query, "alive", alive);
-    add_command(&mut globals.query, "cursor", cursor);
-    add_command(&mut globals.query, "print", print);
-    add_command(&mut globals.query, "put", put);
-    add_command(&mut globals.query, "set", set);
-    add_command(&mut globals.query, "post", post);
-    add_command(&mut globals.query, "out", out);
-    add_command(&mut globals.query, "goto", goto);
-    add_command(&mut globals.query, "if", if_keyword);
-    add_command(&mut globals.query, "op", op);
-    add_command(&mut globals.query, "init", init);
-    add_command(&mut globals.query, "display", display);
-    add_command(&mut globals.query, "set_clear", set_clear);
-    add_command(&mut globals.query, "clear", clear);
-    add_command(&mut globals.query, "handle_input", handle_events);
-    add_command(&mut globals.query, "area", area);
-    add_command(&mut globals.query, "get", get);
-    add_command(&mut globals.query, "resize", resize);
-    add_command(&mut globals.query, "exit", exit_command);
+    
+    add_command(&mut globals.query, &mut globals.arg_numbers, "alive", alive,0);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "cursor", cursor,0);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "print", print,1);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "put", put,3);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "set", set,2);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "post", post,0);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "out", out,1);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "goto", goto,1);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "if", if_keyword,4);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "ifkey", if_key,2);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "op", op,3);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "init", init,4);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "display", display,0);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "set_clear", set_clear,1);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "clear", clear,0);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "handle_input", handle_events,0);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "area", area,5);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "get", get,3);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "resize", resize,2);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "exit", exit_command,1);
 
 
-    //add_command(&mut globals.query, "put", put);
     let file = File::open("res/mockup.glg").unwrap();
     let reader = BufReader::new(file);
 
-    //graphics.init(&mut "Yo".to_string(), (848,480), (212,120));
-
-    //let mut keyboard = buttons::winit_support::keyboard();
-    
-  
     let mut counter = 0;
     for line in reader.lines() 
     {
@@ -75,7 +73,7 @@ fn main() {
             }
             else{
                 
-                string_to_command(&mut globals.commands, &command);
+                string_to_command(&mut globals.arg_numbers,&mut globals.commands, &command);
             }
         }
         else {

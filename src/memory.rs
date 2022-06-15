@@ -1,5 +1,6 @@
 
 use std::{collections::HashMap, mem::discriminant};
+use device_query::{DeviceState, Keycode};
 
 use crate::graphics::Graphics;
 
@@ -11,19 +12,25 @@ pub type Stack = HashMap<String, Types>;
 
 pub struct Globals {
     pub query: Query,
+    pub arg_numbers : HashMap<String,i32>,
     pub commands: Vec<Vec<String>>,
     pub stack: Stack,
     pub labels: HashMap<String, usize>,
     pub cursor: usize,
-    pub graphics : Graphics
+    pub graphics : Graphics,
+    pub keyboard : DeviceState,
+    pub keys : Vec<Keycode>,
 }
 
-pub fn add_command(query: &mut Query, name: &str, command: fn(&mut Globals, Args)) {
+pub fn add_command(query: &mut Query, arg_numbers : &mut HashMap<String,i32>, name: &str, command: fn(&mut Globals, Args), arg_num : i32) {
+    
     match query.get(name) {
         Some(_) => println!("command [{}] already exists!", name),
         None => {
             query.insert(name.to_string(), command);
+            arg_numbers.insert(name.to_string(), arg_num.max(0));
         }
+        
     }
 }
 
@@ -32,27 +39,48 @@ pub fn run(globals: &mut Globals, name: &str, args: Args) {
     globals
         .query
         .get(name)
-        .expect(&format!("ERR: function [{}] does not exist", &name))(globals, args);
+        .unwrap()(globals, args);
 }
 
-pub fn string_to_command(lines: &mut Vec<Vec<String>>, command: &String) {
-    if !command.trim()[0..2].contains("//") {
-        if command.trim().contains(" ") {
+pub fn string_to_command(arg_numbers : &mut HashMap<String,i32>, lines: &mut Vec<Vec<String>>, command: &String) {
+    if !command.trim()[0..2].contains("//") { // is a comment
+        if command.trim().contains(" ") { // does have parameters
             let parts = command.trim().split_once(" ").unwrap();
             let mut arguments: Vec<String> = parts
-                .1
-                .to_string()
-                .split(",")
-                .map(|s| s.trim().to_string())
-                .collect();
+                .1                              // a
+                .to_string()                    // h   
+                .split(",")                     // h
+                .map(|s| s.trim().to_string())  // h                   
+                .collect();                     // h
             let mut v: Vec<String> = vec![parts.0.to_string()];
+            if !arg_numbers.contains_key(&v[0])
+            {
+                panic!("ERR: Command [{}] does not exist",v[0]);
+            }
+            else if *arg_numbers.get(&v[0]).unwrap() != arguments.len() as i32
+            {
+                panic!("ERR: The command [{}] requires [{}] arguments but [{}] were provided",
+                        v[0], arg_numbers.get(&v[0]).unwrap(), arguments.len());
+            }
+
             v.append(&mut arguments);
 
             lines.push(v);
         } else {
-            lines.push(vec![command.trim().to_string()])
+            let command = command.trim().to_string();
+            if !arg_numbers.contains_key(&command)
+            {
+                panic!("ERR: Command [{}] does not exist",command);
+            }
+            else if *arg_numbers.get(&command).unwrap() != 0
+            {
+                panic!("ERR: The command [{}] requires [{}] arguments but [{}] were provided",
+                        command, arg_numbers.get(&command).unwrap(), 0);
+            }
+            lines.push(vec![command])
         }
-    } else {
+    } 
+    else {
         lines.push(vec![])
     }
 }

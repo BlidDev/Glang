@@ -1,7 +1,5 @@
-exit 0
-print hello\tjlkdfj\n
-
-init hello glang, 848, 480, 212, 120
+alive 
+init 848, 480, 212, 120
 
 set WHITE, 16777215
 set BLUE, 2348234
@@ -30,20 +28,34 @@ set place, FILL
     goto $place
 
 #OUT:
-resize 3,3
-put 4,4, $BLUE
-print ====================\n
 
+
+print ====================\n
+set posx, 4
+set posy, 4
 #IF1:
     handle_input
+    clear
+    ifkey Escape,2
+        goto FINISH
+
+    ifkey D,2
+        op $posx, + , 1
+
+    ifkey A,2
+        op $posx, - , 1
+
+    ifkey S,2
+        op $posy, + , 1
+
+    ifkey W,2
+        op $posy, - , 1
+
+    area $posx, $posy,10,10, $BLUE
     display
-
-
-
     goto IF1
 
 
-
+#FINISH:
 print \nfinished\n
 
-//d

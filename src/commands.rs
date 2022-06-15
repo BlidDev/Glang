@@ -1,7 +1,7 @@
 use std::{mem::discriminant, process::exit};
-
 use crate::memory::{get_var, is_variable, parse_variable, run, Args, Globals, Types};
 use beryllium::event::Event;
+use device_query::{DeviceQuery, Keycode};
 use unescape::unescape;
 
 pub fn alive(_: &mut Globals, _: Args) {
@@ -33,8 +33,7 @@ pub fn out(globals: &mut Globals, _args: Args) {
     }
 }
 
-// set var, 4.5
-// set var2, $var
+
 pub fn set(globals: &mut Globals, _args: Args) {
     let args = _args.unwrap().clone();
     if args.len() != 2 {
@@ -111,7 +110,7 @@ pub fn if_keyword(globals: &mut Globals, _args: Args) {
     if let Types::I32(r) = get_var(&mut globals.stack, &args[3]) {
         range = (r).max(1) as usize;
     }
-    if statement(&first, &second, &op) == true{
+    if statement(&first, &second, &op){
         let border = globals.cursor + range;
         globals.cursor+=1;
         while globals.cursor < border
@@ -132,6 +131,36 @@ pub fn if_keyword(globals: &mut Globals, _args: Args) {
     }
 }
 
+
+pub fn if_key(globals: &mut Globals, args: Args) {
+    let key = get_var(&mut globals.stack, &args.as_ref().unwrap()[0]);
+    let range = get_var(&mut globals.stack, &args.as_ref().unwrap()[1]);
+    
+    if let (Types::STR(key), Types::I32(range)) =  (key,range){
+        let keycode  : Keycode = (&key).parse().expect("ERR: Invalid keycode {}");
+    
+        if globals.keys.contains(&keycode) == true{
+            let border = globals.cursor + range as usize;
+            globals.cursor+=1;
+            while globals.cursor < border
+            {
+                let command = &globals.commands[globals.cursor].clone();
+                match command.len() {
+                    0 => {}
+                    1 => run(globals, &command[0], None),
+                    _ => run(globals, &command[0], Some(command[1..].to_vec())),
+                }
+                globals.cursor +=1;
+            }  
+            
+        
+            
+        } else {
+            globals.cursor += range as usize;
+        }
+    }
+}
+
 pub fn op(globals: &mut Globals, _args: Args) {
     let args = _args.unwrap().clone();
     let second = get_var(&globals.stack, &args[2]);
@@ -142,7 +171,6 @@ pub fn op(globals: &mut Globals, _args: Args) {
     let op = args[1].as_str();
 
     if let (Types::I32(a), Types::I32(b)) = (&first, &second) {
-        //println!("({} {})",a,b);
         match op {
             "+" => *first = Types::I32(a + b),
             "-" => *first = Types::I32(a - b),
@@ -171,16 +199,16 @@ pub fn op(globals: &mut Globals, _args: Args) {
 
 pub fn init(globals: &mut Globals, args: Args)
 {
-     let name = get_var(&mut globals.stack, &args.as_ref().unwrap()[0]);
-     let window_w = get_var(&mut globals.stack, &args.as_ref().unwrap()[1]);
-     let window_h = get_var(&mut globals.stack, &args.as_ref().unwrap()[2]);
-     let canvas_w = get_var(&mut globals.stack, &args.as_ref().unwrap()[3]);
-     let canvas_h = get_var(&mut globals.stack, &args.as_ref().unwrap()[4]);
+     
+     let window_w = get_var(&mut globals.stack, &args.as_ref().unwrap()[0]);
+     let window_h = get_var(&mut globals.stack, &args.as_ref().unwrap()[1]);
+     let canvas_w = get_var(&mut globals.stack, &args.as_ref().unwrap()[2]);
+     let canvas_h = get_var(&mut globals.stack, &args.as_ref().unwrap()[3]);
 
-     if let (Types::STR(mut n), Types::I32(ww), Types::I32(wh), Types::I32(cw), Types::I32(ch)) 
-          = (name, window_w, window_h, canvas_w, canvas_h) 
+     if let (Types::I32(ww), Types::I32(wh), Types::I32(cw), Types::I32(ch)) 
+          = (window_w, window_h, canvas_w, canvas_h) 
      {
-          globals.graphics.init(&mut n, (ww,wh), (cw as u32, ch as u32))
+          globals.graphics.init((ww,wh), (cw as u32, ch as u32))
           .expect("ERR: Could not initialize graphics");
      }
 }
@@ -202,7 +230,6 @@ pub fn rgb_to_int(color : (u8,u8,u8))-> i32
 
 fn set_pixel(buffer : &mut [u8], index : usize, color : &[u8;4])
 {
-     //println!("{index:?}");
      buffer.chunks_exact_mut(4).nth(index).expect("ERR: Pixel index is out of range").copy_from_slice(color);
 }
 
@@ -306,14 +333,19 @@ pub fn clear(globals: &mut Globals, _: Args)
 pub fn handle_events(globals: &mut Globals, _: Args)
 {
     is_inited(globals.graphics.is_inited, "handle_input");
+    globals.keys = vec![];
     while let Some(event) = globals.graphics.sdl_context.as_ref().unwrap().poll_event() {
           match event {
                Event::Quit { .. }=> exit(0),
 
                 Event::WindowResized { width, height, .. } => globals.graphics.pixels.as_mut().unwrap().resize_surface(width, height),
-               _=>(),
+                Event::Keyboard {..} => {globals.keys = globals.keyboard.get_keys()},
+                _=>(),
           }
      }
+     
+     
+     
 }
 
 

@@ -4,8 +4,7 @@ use beryllium::{
     init::{InitFlags, Sdl},
     vk_window::VkWindow, window::WindowFlags,
 };
-use std::ptr::NonNull;
-use zstring::ZStr;
+use zstring::zstr;
 
 pub struct Graphics {
     pub is_inited: bool,
@@ -30,7 +29,7 @@ impl Graphics {
         }
     }
 
-    pub fn init(&mut self, title: &mut str, window_size: (i32, i32), canvas_size: (u32, u32)) -> Result<&mut Self, Box<dyn std::error::Error>> {
+    pub fn init(&mut self, window_size: (i32, i32), canvas_size: (u32, u32)) -> Result<&mut Self, Box<dyn std::error::Error>> {
         self.window_size = window_size;
         self.canvas_size = canvas_size;
         self.cleanup_buffer = vec![0u8; (canvas_size.0 * canvas_size.1 * 4) as usize];
@@ -38,14 +37,15 @@ impl Graphics {
             pixel.copy_from_slice(&[0u8,0u8,0u8,255u8]);
         }
         self.sdl_context = Some(Sdl::init(InitFlags::EVERYTHING)?);
-        unsafe{
+        
         self.window = Some(self.sdl_context.as_ref().unwrap().create_vk_window(
-            ZStr::from_non_null_unchecked(NonNull::new(title.as_mut_ptr()).unwrap()),
+            //ZStr::from_non_null_unchecked(NonNull::new(title.as_mut_ptr()).unwrap()),
+            zstr!("Glang Window"),
             None,
             self.window_size,
             WindowFlags::ALLOW_HIGHDPI | WindowFlags::RESIZABLE | WindowFlags::VULKAN,
         )?);
-        }
+        
         self.pixels = Some(
             {
                 let window = self.window.as_ref().unwrap();
