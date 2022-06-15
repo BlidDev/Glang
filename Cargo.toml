@@ -7,9 +7,8 @@ edition = "2021"
 
 [dependencies]
 unescape = "0.1.0"
-env_logger = "0.9"
 log = "0.4"
 pixels = "0.9.0"
-winit = "0.26"
-winit_input_helper = "0.12"
-buttons = {version = "0.3.1", features = ["winit-support"]}
+beryllium = { version = "0.7", features = ["use-raw-window-handle"] }
+fermium = { version = "20016.1.1", default-features = false }
+zstring = "0.1.3"

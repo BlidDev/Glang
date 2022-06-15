@@ -4,11 +4,7 @@ mod memory;
 use commands::*;
 use memory::*;
 use graphics::*;
-use winit::event::{Event, WindowEvent};
-use winit::event_loop::{EventLoop, ControlFlow};
-use winit::window::Window;
 use core::panic;
-use std::borrow::BorrowMut;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
@@ -28,7 +24,7 @@ fn main() {
         cursor : 0,
         graphics : Graphics::default()
     };
-    
+    //std::env::set_var("RUST_BACKTRACE", "1");
     add_command(&mut globals.query, "alive", alive);
     add_command(&mut globals.query, "cursor", cursor);
     add_command(&mut globals.query, "print", print);
@@ -41,13 +37,21 @@ fn main() {
     add_command(&mut globals.query, "op", op);
     add_command(&mut globals.query, "init", init);
     add_command(&mut globals.query, "display", display);
+    add_command(&mut globals.query, "set_clear", set_clear);
     add_command(&mut globals.query, "clear", clear);
+    add_command(&mut globals.query, "handle_input", handle_events);
+    add_command(&mut globals.query, "area", area);
+    add_command(&mut globals.query, "get", get);
+    add_command(&mut globals.query, "resize", resize);
+    add_command(&mut globals.query, "exit", exit_command);
+
+
     //add_command(&mut globals.query, "put", put);
     let file = File::open("res/mockup.glg").unwrap();
     let reader = BufReader::new(file);
 
-    let mut graphics = Graphics::default();
-    
+    //graphics.init(&mut "Yo".to_string(), (848,480), (212,120));
+
     //let mut keyboard = buttons::winit_support::keyboard();
     
   
@@ -80,17 +84,12 @@ fn main() {
         }
         counter+=1;
     }
-    let mut is_ok = false; // used to check if we initilized graphics or just existed the program
+    
 
     
     
     while globals.cursor != usize::MAX && globals.cursor < globals.commands.len()
     {
-        if globals.graphics.is_inited 
-        {
-            is_ok = true;
-            break;
-        }
         let command = &globals.commands[globals.cursor].clone();
         match command.len()
         {
@@ -103,19 +102,7 @@ fn main() {
     }
 
 
-    if globals.graphics.is_inited && is_ok
-    {
-        
-        globals.graphics.event_loop.unwrap().run(|event,_,control_flow|{
-            match event {
-                Event::WindowEvent {
-                    event: WindowEvent::CloseRequested,
-                    window_id,
-                } if window_id == globals.graphics.window.as_ref().unwrap().id() => *control_flow = ControlFlow::Exit,
-                _ => (),
-            }
-        });
-    }
+  
 
 }
 

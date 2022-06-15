@@ -1,42 +1,46 @@
-print hello\tjlkdfj
-
-
-set var1, 10
-set var2, 10
-set var3, 0
-print started
+exit 0
+print hello\tjlkdfj\n
 
 init hello glang, 848, 480, 212, 120
+
+set WHITE, 16777215
+set BLUE, 2348234
+print started\n
+
+
+set_clear $WHITE
+clear
+
+
+
+
+put 119,119,$BLUE
+set i, 0
+set place, FILL
+
+
 #FILL:
-if $var3, <, $var2, 5
-    put $var3, $var3, 45656
+    get $i,$i, color
+    if $color, ==, $BLUE, 2
+    set place, OUT
 
-    op $var3, +, 1
-    
-    goto FILL
+    put $i,$i,$BLUE
+    op $i, +,1
 
+    goto $place
 
+#OUT:
+resize 3,3
+put 4,4, $BLUE
+print ====================\n
 
-
-
-
-
-
-print ====================
 #IF1:
-if $var1, >,   0,          9
-    //op $var1, -, 1
-    //set var2, 10
-    //op $var2, - , $var1
-    //print This ran:
-    //out $var2
-    //print times
+    handle_input
     display
-    out $var1
+
+
+
     goto IF1
-
-
-
 
 
 
