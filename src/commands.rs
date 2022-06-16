@@ -150,6 +150,26 @@ pub fn statement(first: &Types, second: &Types, op: &str) -> bool {
             "!=" => return a != b,
             _ => panic!("ERR: Unknown operation [{}]", op),
         }
+    } else if let (Types::BOOL(a), Types::BOOL(b)) = (first, second) {
+        match op {
+            ">" => return a > b,
+            "<" => return a < b,
+            "<=" => return a <= b,
+            ">=" => return a >= b,
+            "==" => return a == b,
+            "!=" => return a != b,
+            _ => panic!("ERR: Unknown operation [{}]", op),
+        }
+    } else if let (Types::STR(a), Types::STR(b)) = (first, second) {
+        match op {
+            ">" => return a > b,
+            "<" => return a < b,
+            "<=" => return a <= b,
+            ">=" => return a >= b,
+            "==" => return a == b,
+            "!=" => return a != b,
+            _ => panic!("ERR: Unknown operation [{}]", op),
+        }
     } else {
         panic!(
             "ERR: Can't compare type [{:?}] and [{:?}]",
