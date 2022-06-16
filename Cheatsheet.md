@@ -6,16 +6,16 @@
 # Variables
 
 ### Glang has 4 variable types
-* I32 (descrimination index = 0)
-* F32 (descrimination index = 1)
-* BOOL (descrimination index = 2)
-* STR (descrimination index = 3)
+* I32 (discrimination index = 0)
+* F32 (discrimination index = 1)
+* BOOL (discrimination index = 2)
+* STR (discrimination index = 3)
 
 ## set
 **Description**: Declares a new variable; if it already exists, the value will be overwritten.  
 **Usage**: ``set [identifier], [value] ``  
 **Args**:  
-* ``idetifier``: The name of the new variable (literal)
+* ``identifier``: The name of the new variable (literal)
 * ``value``: The value that'll be inserted into the variable. Can be a literal (such as `5`) or  a variable's value (`set var2, $var1`)  
 
 **Example**: ```set var1, 11```
@@ -28,7 +28,7 @@
 * `start`: Integer or float (literal or variable's value)
 * `end`: Integer or float (literal or variable's value)
 
-**NOTE**: The destination variable's name can be change dynamcially.
+**NOTE**: The destination variable's name can be change dynamically.
 **Examples**:   
 
 1. `rng var, 1, 10`
@@ -51,12 +51,12 @@
 **Description**: Performs a math operation on the first specified value.  
 **Usage**: `op [variable], [operator], [opvalue]`  
 **Args**:  
-* `variable`: Variable refernce (such as `$var`)
-* `operator`: Operator string, avilable operators:
+* `variable`: Variable reference (such as `$var`)
+* `operator`: Operator string, available operators:
     * `+`: Plus  
     * `-`: Minus  
     * `*`: Multiply  
-    * `/`: Devide   
+    * `/`: Divide   
 * `opvalue`: Second operation argument (could be a literal or a variable's value)
 
 **Example**: `op $var, *, 7`
@@ -65,7 +65,7 @@
 **Description**: Deletes a variable from the memory stack.  
 **Usage**: `release [variable]`  
 **Args**:
-* `variable`: Variable refernce (such as `$var`)  
+* `variable`: Variable reference (such as `$var`)  
 
 **Example**: `release $foo`  
 
@@ -78,7 +78,7 @@
 
 ## Labels
 
-**Description**: Creates a refernce to a place in a file.  
+**Description**: Creates a reference to a place in a file.  
 **Usage**: `#[label_name]:`  
 **Args**:
 * `label_name`: String literal (cannot be a variable's value) 
@@ -109,7 +109,7 @@
     * `==`: Equals to
     * `!=`: Not equal to
 * `num2`: Right value (literal or variable)
-* `scope range`: Specifies the length of the condition's scope  (integeer literal or variable's value)
+* `scope range`: Specifies the length of the condition's scope  (integer literal or variable's value)
 
 **Example**: `if $var, <=, 10, 4`
 
@@ -118,7 +118,7 @@
 **Usage**: ``ifkey [keycode], [scope range]``  
 **Args**:
 * `keycode`: String value (literal or variable) of a [Device Query keycode](https://docs.rs/device_query/latest/device_query/keymap/enum.Keycode.html)
-* `scope range`: Specifies the length of the condition's scope  (integeer literal or variable's value)
+* `scope range`: Specifies the length of the condition's scope  (integer literal or variable's value)
 
 **Example**: `ifkey Up, 2  `
 
@@ -149,7 +149,7 @@
 
 # Graphics / Input Handling
 ## init
-**Description**: Initilizes a new canvas window with the specified arguments.  
+**Description**: Initializes a new canvas window with the specified arguments.  
 **Usage**: ``init [window_width], [window_height], [canvas_width], [canvas_height]``   
 **Args**: 
 * `[window_width] `: Integer value (literal or variable's value)
@@ -190,7 +190,7 @@
 **Example**: `handle_input`
 
 ## put 
-**Description**: Places in the canvas a colored pixel at the given coorinates.
+**Description**: Places in the canvas a colored pixel at the given coordinates.
 **Usage**: `put [x], [y], [color]`
 **Args**:
 * `x`: Integer value (literal or variable's value)
@@ -200,7 +200,7 @@
 **Example**: `put 24, $var, 3315350`
 
 ## get
-**Description**: The reverse of `put`, gets the color from the pixel at the given coorinates and inserts it into a given variable.  
+**Description**: The reverse of `put`, gets the color from the pixel at the given coordinates and inserts it into a given variable.  
 **Usage**: `get [var_name], [x], [y]`  
 **Args**:
 * `var_name`: The variable to get the [integer RGB value](https://www.checkyourmath.com/convert/color/rgb_decimal.php) (literal)
@@ -229,7 +229,7 @@
 
 ## A summery use of most of the graphical functions
 ```  kotlin
-// Initilze a 848x480 window with a 51x51 canvas
+// Initializes a 848x480 window with a 51x51 canvas
 init 848, 480, 51, 51
 
 // Set a nice color setup
