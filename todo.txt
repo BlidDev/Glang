@@ -1,0 +1,30 @@
+commands:
+
+exsiting:
+    -alive
+    -cursor
+    -print
+    -put
+    -set
+    -post
+    -out
+    -goto
+    -if
+    -ifkey
+    -op
+    -init
+    -display
+    -set_clear
+    -clear
+    -handle_input
+    -area
+    -get
+    -resize
+    -exit
+    -rng
+    -release
+    -reset
+    -sleep
+
+
+

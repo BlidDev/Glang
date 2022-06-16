@@ -7,6 +7,7 @@ use memory::*;
 use graphics::*;
 use core::panic;
 use std::collections::HashMap;
+use std::env;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
@@ -15,6 +16,15 @@ use std::io::{prelude::*, BufReader};
 
 
 fn main() {
+    let path;
+    let args : Vec<String> = env::args().collect();
+    if args.len() != 2
+    {
+        panic!("ERR: No path provided\nUsage: glang.exe /path/to/code(*.glg))")
+    }
+    path = args[1].clone();
+    println!("{:?}",args);
+
     let mut globals = Globals
     {
         query : Query::new(),
@@ -48,9 +58,13 @@ fn main() {
     add_command(&mut globals.query, &mut globals.arg_numbers, "get", get,3);
     add_command(&mut globals.query, &mut globals.arg_numbers, "resize", resize,2);
     add_command(&mut globals.query, &mut globals.arg_numbers, "exit", exit_command,1);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "release", release,1);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "reset", reset,0);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "sleep", sleep,1);
+    add_command(&mut globals.query, &mut globals.arg_numbers, "rng", rng,3);
 
 
-    let file = File::open("res/mockup.glg").unwrap();
+    let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
 
     let mut counter = 0;

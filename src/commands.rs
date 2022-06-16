@@ -1,8 +1,10 @@
-use std::{mem::discriminant, process::exit};
-use crate::memory::{get_var, is_variable, parse_variable, run, Args, Globals, Types};
+use std::{mem::discriminant, process::exit, thread, time};
+use crate::memory::{get_var, is_variable, parse_variable, run, Args, Globals, Types, Stack};
 use beryllium::event::Event;
 use device_query::{DeviceQuery, Keycode};
+use rand::{thread_rng, Rng};
 use unescape::unescape;
+
 
 pub fn alive(_: &mut Globals, _: Args) {
     println!("alive!");
@@ -34,19 +36,11 @@ pub fn out(globals: &mut Globals, _args: Args) {
 }
 
 
-pub fn set(globals: &mut Globals, _args: Args) {
-    let args = _args.unwrap().clone();
-    if args.len() != 2 {
-        panic!(
-            "ERR: Set requires 2 arguments but [{}] were provided",
-            args.len()
-        );
-    }
+pub fn set(globals: &mut Globals, args: Args) {
+    let name = args.as_ref().unwrap()[0].clone();
+    let str_value = args.as_ref().unwrap()[1].as_str();
 
-    let name = args[0].clone();
-    let str_value = args[1].clone();
-
-    if is_variable(&str_value) {
+    if is_variable(str_value) {
         let value_name = &str_value[1..];
         let value = globals
             .stack
@@ -59,6 +53,71 @@ pub fn set(globals: &mut Globals, _args: Args) {
         *globals.stack.entry(name).or_insert(value.clone()) = value.clone();
     }
 }
+
+
+pub fn release(globals: &mut Globals, args: Args)
+{
+    let str_value = &args.as_ref().unwrap()[0];
+    if is_variable(&str_value)
+    {
+        let value_name = &str_value[1..];
+        globals.stack.remove(value_name)
+                      .expect(&format!("ERR: No variable name [{}]", value_name));
+    }
+    else {
+        panic!("ERR: Can not release, [{}] is not a variable",str_value);
+    }
+}
+pub fn reset(globals: &mut Globals, _: Args)
+{
+    globals.stack = Stack::new();
+}
+
+pub fn sleep(globals: &mut Globals, args: Args)
+{
+    if let Types::I32(mut millis) = get_var(&globals.stack, &args.as_ref().unwrap()[0]) {
+        millis = millis.max(0); 
+        let time = time::Duration::from_millis(millis as u64);
+        thread::sleep(time)
+    }
+}
+
+pub fn rng(globals: &mut Globals, args: Args)
+{
+    let name = get_var(&globals.stack, &args.as_ref().unwrap()[0]);
+    let start = get_var(&globals.stack, &args.as_ref().unwrap()[1]);
+    let end = get_var(&globals.stack, &args.as_ref().unwrap()[2]);
+    if let (Types::STR(name),Types::I32(mut start),Types::I32(mut end)) = (&name, &start, &end)
+    {
+        start = start.max(0);
+        end = end.max(0);
+        if start < end // valid range
+        {
+            let rng = thread_rng().gen_range(start..end);
+            *globals.stack.entry(name.to_string()).or_insert(Types::I32(rng)) = Types::I32(rng);
+        }
+        else
+        {
+            panic!("ERR: Invaild rng range [{}..{}]",start,end);
+        }
+    }
+    else if let (Types::STR(name),Types::F32(mut start),Types::F32(mut end)) = (name, start, end)
+    {
+        start = start.max(0.0);
+        end = end.max(0.0);
+        if start < end // valid range
+        {
+            let rng = thread_rng().gen_range(start..end);
+            *globals.stack.entry(name).or_insert(Types::F32(rng)) = Types::F32(rng);
+        }
+        else
+        {
+            panic!("ERR: Invaild rng range [{}..{}]",start,end);
+        }
+    }
+}
+
+
 
 pub fn goto(globals: &mut Globals, args: Args) {
     let label_name = get_var(&globals.stack, &args.as_ref().unwrap()[0]);
@@ -100,17 +159,16 @@ pub fn statement(first: &Types, second: &Types, op: &str) -> bool {
     }
 }
 
-pub fn if_keyword(globals: &mut Globals, _args: Args) {
-    //println!("{:?}",_args);
-    let args = _args.unwrap().clone();
-    let first = get_var(&mut globals.stack, &args[0]);
-    let op = args[1].clone();
-    let second = get_var(&mut globals.stack, &args[2]);
+pub fn if_keyword(globals: &mut Globals, args: Args) {
+        
+    let first = get_var(&mut globals.stack, &args.as_ref().unwrap()[0]);
+    let op = &args.as_ref().unwrap()[1];
+    let second = get_var(&mut globals.stack, &args.as_ref().unwrap()[2]);
     let mut range = 0;
-    if let Types::I32(r) = get_var(&mut globals.stack, &args[3]) {
+    if let Types::I32(r) = get_var(&mut globals.stack, &args.as_ref().unwrap()[3]) {
         range = (r).max(1) as usize;
     }
-    if statement(&first, &second, &op){
+    if statement(&first, &second, op){
         let border = globals.cursor + range;
         globals.cursor+=1;
         while globals.cursor < border
