@@ -1,65 +1,96 @@
-# glang README
+# Glang
+## Backstory
+Hello and welcome to the Glang git repository. Game Slang or in short Glang is a super simple interpeted language written in Rust with the soul purpose to make pong not the best nessacerly. After making [a video](https://youtu.be/9JNUzwDLucA) about it, a lot of people requested an update so I made a new version, a little better this time.
 
-This is the README for your extension "glang". After writing up a brief description, we recommend including the following sections.
+### Discailmer
+Glang was made as an experimentnal side project of mine and by **no means** was meant for serious use other than playing around. It is extremely unstable and limited.
 
-## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
 
-For example if there is an image subfolder under your extension project workspace:
+## Libraries I used
+* `Unescape`
+* ``Pixels``
+* ``Device Query``
+* ``Beryllium``
+* ``Fermium``
+* ``Zstring``
+* ``Open``
 
-\!\[feature X\]\(images/feature-x.png\)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-## Requirements
+## Installation/Use
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### Installing the syntax highlighting Visual Studio Code extension:
+1. Grab ``glang-extention.zip`` from the repository or from the [itch.io page](https://blid.itch.io/glang)
+2. Exctract the ``glang`` folder within the ``.zip`` file into your ``.vscode/extensions`` folder (located in ``C:/Users/USERNAME/.vscode/extensions`` on Windows)
+3. Open Visual Studio Code, the extension should appear in your ``installed`` category in the extensions tab and every file ending with ``.glg`` will be highlighted correctly.
 
-## Extension Settings
+### Building from source:
+Since Glang code base is written in Rust building it from source should be cross platform as long as you have ``cargo`` and ``cmake`` installed:
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+1. Open your OS's terminal and type in ```git git clone https://github.com/BlidDev/Glang.git```.
+2. After git finishes cloning the repository ```cd``` into the Glang folder.
+3. Type in ```cargo build --release``` (building for the first time will take a bit of time since Rust imports all the libraries)
+4. Rust will create a new folder called ``target`` and one called ``release``. Inside release you'll find the ``glang`` executedable, you can now use it as mentioned bellow.
 
-For example:
+### Windows:
+1. Get ``glang.exe`` from building the project from source or from downloading and unszipping the [itch.io release](https://blid.itch.io/glang)
+2. Run a script by typing in the terminal (in the same directory as the ``exe`` file) ```glang.exe path/to/script.glg```
+### Linux:
+1. Get ``glang`` from building the project from source or from downloading and unszipping the [itch.io release](https://blid.itch.io/glang)
+2. Run a script by typing in the terminal (in the same directory as the ``exe`` file) ```./glang path/to/script.glg```
 
-This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+--- 
 
-## Known Issues
+## Example Code
+### An example with no graphics:
+```kotlin
+// This code will generate and print 10 random numbers from 0 to 99
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+print Hello\tWorld!\n
+set i, 0 
+set r, 0
 
-## Release Notes
+#LOOP:
+if i, <, 10, 3
+    rng r, 0, 100
+    out $r
+    goto LOOP
 
-Users appreciate release notes as you update your extension.
+print Finished!\n
+```
 
-### 1.0.0
+### An example of using graphics:
 
-Initial release of ...
+```kotlin
+// This programs draws a blue diagonal line of pixels from (0,0) to (119,119)
 
-### 1.0.1
+init 848,480,212,120
+set WHITE, 16777215
+set BLUE, 255
 
-Fixed issue #.
+set_clear $WHITE
+clear
 
-### 1.1.0
+put 119, 119, $BLUE
+set i, 0
 
-Added features X, Y, and Z.
+#FIIL_LOOP:
+    get color, $i, $i
+    if color, ==, $BLUE,2
+        goto GAME_LOOP
 
------------------------------------------------------------------------------------------------------------
+#GAME_LOOP:
+handle_input
+display
+goto GAME_LOOP
 
-## Working with Markdown
+```
 
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
+## Documentation
+You can find basic documentation of Glang in the attached [cheatsheet]()
 
-### For more information
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+## **Thanks for tyring out Glang! :)**
