@@ -90,7 +90,7 @@ goto GAME_LOOP
 
 
 ## Documentation
-You can find basic documentation of Glang in the attached [cheatsheet]()
+You can find basic documentation of Glang in the attached [cheatsheet](Cheatsheet.md)
 
 
 ## **Thanks for tyring out Glang! :)**
