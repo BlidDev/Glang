@@ -1,0 +1,151 @@
+set WHITE, 16777215
+set RED, 16711680
+set DARKBLUE, 3289700
+set GRAY, 3289650
+
+set panelwidth, 60
+set panelspeed, 4
+
+set panelshould, 209
+op $panelshould, -, $panelwidth
+
+
+
+set name, AFTER1
+goto RESETGAME
+#AFTER1:
+
+    
+
+
+init 848,480,212,120
+
+
+
+#LOOP:
+    handle_input
+    clear
+
+    goto INPUT
+    #AFER_INPUT:
+
+    goto HANDLE_BALL
+    #AFTER_BALL:
+
+    area 1, 1, 210, 118, $WHITE
+    area 3, 3, 206, 114, 0
+    area $panel, 114, $panelwidth, 1, $DARKBLUE
+    area $enemy, $enemyY, $enemywidth, 1, $GRAY
+    put $ballx, $bally, $RED
+
+    display
+goto LOOP
+
+
+#INPUT:
+    ifkey Escape,2
+        exit 0
+
+    ifkey D,2
+        op $panel, + , $panelspeed
+
+    ifkey A,2
+        op $panel, - , $panelspeed
+
+    if $panel, >, $panelshould, 2
+        set panel, $panelshould
+
+    if $panel, <, 3, 2
+        set panel, 3
+
+goto AFER_INPUT
+
+
+
+#HANDLE_BALL:
+
+    op $ballx, +, $velx
+    op $bally, +, $vely
+
+    if $bally, ==, 119, 2
+        goto GAMEOVER
+
+    if $ballx, <=, 3,3
+        set ballx, 3
+        op $velx, *, -1
+
+    if $ballx, >=, 209,3
+        set ballx, 209
+        op $velx, *, -1
+
+    if $bally, <=, 3,3
+        set bally, 3
+        op $vely, *, -1
+
+    set isok, false
+
+    if $bally, ==, 113, 21
+        set tmp, $panel
+        op $tmp, +, $panelwidth
+        if $ballx, <=, $tmp, 12
+            #RERNG:
+            if $ballx, >=, $panel, 10
+                rng rand, 0 , 99
+
+                if $rand, >, 50, 2
+                     op $velx, *, -1
+                
+                    
+
+                set vely, -1
+                set isok, true
+                
+
+        if $isok, ==, true, 2
+            goto AFTER_BALL
+        
+        goto GAMEOVER
+
+    
+    set tmp2, $enemyY
+    op $tmp2, +, 1
+    if $bally, ==, $tmp2, 16
+
+        set tmp3, $enemy
+        op $tmp3, +, $enemywidth
+
+        if $ballx, <=, $tmp3, 10
+            if $ballx, >=, $enemy, 9
+                set_clear $WHITE
+                clear
+                display
+                sleep 500
+                set_clear 0
+                set name, AFTER2
+                goto RESETGAME
+                #AFTER2:
+
+
+
+
+
+
+goto AFTER_BALL
+
+
+#RESETGAME:
+    set panel, 30
+    set ballx, 105
+    set bally, 59
+
+    set velx, -1
+    set vely, -1
+    rng enemywidth, 20, 30
+    set enemyshould, 209
+    op $enemyshould, -, $enemywidth
+    rng enemy, 3, $enemyshould 
+    rng enemyY, 4, 10 
+
+goto $name
+
+#GAMEOVER:
