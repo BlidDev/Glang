@@ -1,6 +1,8 @@
 ***Original cheatsheet by [Dorbell](https://www.youtube.com/c/DingDongDirt).***  
 ***Modified and updated by [Blid](https://www.youtube.com/c/BlidDev).***  
 
+## Before reading 
+I highly suggest to also check out some of examples in the ``examples`` in order to see the language used in practice 
 
 
 # Variables
