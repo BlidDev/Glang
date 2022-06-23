@@ -30,7 +30,7 @@ Since Glang code base is written in Rust building it from source should be cross
 
 **Note**: In all operating systems you'll need the most recent version of both ``Rust/Rustup`` and ``CMake``. I addition you'll also need the ``libx11-dev`` and ``libxv-dev`` packages on **Linux**.
 
-1. Open your OS's terminal and type in ```git git clone https://github.com/BlidDev/Glang.git```.
+1. Open your OS's terminal and type in ```git clone https://github.com/BlidDev/Glang.git```.
 2. After git finishes cloning the repository ```cd``` into the Glang folder.
 3. Type in ```cargo build --release``` (building for the first time will take a bit of time since Rust imports all the libraries)
 4. Rust will create a new folder called ``target`` and one called ``release``. Inside release you'll find the ``glang`` executable, you can now use it as mentioned bellow.
