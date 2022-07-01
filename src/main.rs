@@ -1,7 +1,9 @@
+// Modules
 mod graphics;
 mod commands;
 mod memory;
 
+// Includes
 use commands::*;
 use device_query::DeviceState;
 use memory::*;
@@ -87,10 +89,10 @@ fn main() {
         let command = line.unwrap();
 
         // If line is not empty...
-        if ( !command.trim().is_empty() ) {
+        if !command.trim().is_empty() {
             
             // If it's a label...
-            if ( command.trim().starts_with('#') && command.trim().ends_with(':') ) {
+            if command.trim().starts_with('#') && command.trim().ends_with(':') {
                 let label_name : &str = &command.trim()[1..command.trim().len()-1];
                 
                 // If no other label of that name exists...
