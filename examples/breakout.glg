@@ -1,151 +1,167 @@
+// Color Variables
 set WHITE, 16777215
 set RED, 16711680
 set DARKBLUE, 3289700
 set GRAY, 3289650
 
+// Panel Variables
 set panelwidth, 60
-set panelspeed, 4
+set panelSpeed, 4
+set panelShould, 209
+op $panelShould, -, $panelwidth
 
-set panelshould, 209
-op $panelshould, -, $panelwidth
-
-
-
+// Starts new game
 set name, AFTER1
-goto RESETGAME
+goto RESET_GAME
+
+// Creates a new window
 #AFTER1:
-
-    
-
-
-init 848,480,212,120
+    init 848,480,212,120
 
 
-
+// The game
 #LOOP:
     handle_input
     clear
 
     goto INPUT
-    #AFER_INPUT:
+    #AFTER_INPUT:
+        goto HANDLE_BALL
 
-    goto HANDLE_BALL
     #AFTER_BALL:
+        // White border
+        area 1, 1, 210, 118, $WHITE
+        // Black background
+        area 3, 3, 206, 114, 0
+        // Player
+        area $panel, 114, $panelwidth, 1, $DARKBLUE
+        // Target
+        area $enemy, $enemyY, $enemyWidth, 1, $GRAY
+        // Sets the new position and color of ball
+        put $xBall, $yBall, $RED
 
-    area 1, 1, 210, 118, $WHITE
-    area 3, 3, 206, 114, 0
-    area $panel, 114, $panelwidth, 1, $DARKBLUE
-    area $enemy, $enemyY, $enemywidth, 1, $GRAY
-    put $ballx, $bally, $RED
-
+    // Update screen
     display
 goto LOOP
 
 
 #INPUT:
+    // Quits game
     ifkey Escape,2
         exit 0
 
+    // Move Right
     ifkey D,2
-        op $panel, + , $panelspeed
+        op $panel, + , $panelSpeed
 
+    // Move Left
     ifkey A,2
-        op $panel, - , $panelspeed
+        op $panel, - , $panelSpeed
 
-    if $panel, >, $panelshould, 2
-        set panel, $panelshould
+    // Keeps player within right wall
+    if $panel, >, $panelShould, 2
+        set panel, $panelShould
 
+    // Keeps player within left wall
     if $panel, <, 3, 2
         set panel, 3
 
-goto AFER_INPUT
+goto AFTER_INPUT
 
 
 
+// Handles the ball movement
 #HANDLE_BALL:
+    // Increases ball position by velocity
+    op $xBall, +, $xVel
+    op $yBall, +, $yvel
 
-    op $ballx, +, $velx
-    op $bally, +, $vely
+    // Checks if ball is out of bounds
+    if $yBall, ==, 119, 2
+        goto GAME_OVER
 
-    if $bally, ==, 119, 2
-        goto GAMEOVER
-
-    if $ballx, <=, 3,3
-        set ballx, 3
-        op $velx, *, -1
-
-    if $ballx, >=, 209,3
-        set ballx, 209
-        op $velx, *, -1
-
-    if $bally, <=, 3,3
-        set bally, 3
-        op $vely, *, -1
+    // Bounces ball off of left wall
+    if $xBall, <=, 3,3
+        set xBall, 3
+        op $xVel, *, -1
+    // Bounces ball off of right wall
+    if $xBall, >=, 209,3
+        set xBall, 209
+        op $xVel, *, -1
+    // Bounces ball off of top wall
+    if $yBall, <=, 3,3
+        set yBall, 3
+        op $yvel, *, -1
 
     set isok, false
 
-    if $bally, ==, 113, 21
+    // If the ball is on the players level
+    if $yBall, ==, 113, 21
         set tmp, $panel
         op $tmp, +, $panelwidth
-        if $ballx, <=, $tmp, 12
+        
+        // If the ball hit the player
+        if $xBall, <=, $tmp, 12
             #RERNG:
-            if $ballx, >=, $panel, 10
+            if $xBall, >=, $panel, 10
                 rng rand, 0 , 99
-
+                // Determines whether the ball will go left or right
                 if $rand, >, 50, 2
-                     op $velx, *, -1
-                
-                    
-
-                set vely, -1
+                     op $xVel, *, -1
+                // Moves ball up
+                set yvel, -1
                 set isok, true
                 
 
+        // Sent to appropriate label
         if $isok, ==, true, 2
             goto AFTER_BALL
-        
-        goto GAMEOVER
+        goto GAME_OVER
 
-    
+    // Temp variable
     set tmp2, $enemyY
     op $tmp2, +, 1
-    if $bally, ==, $tmp2, 16
 
+    // If the ball is on level with the target
+    if $yBall, ==, $tmp2, 18
+        // Another temp variable
         set tmp3, $enemy
-        op $tmp3, +, $enemywidth
+        op $tmp3, +, $enemyWidth
 
-        if $ballx, <=, $tmp3, 10
-            if $ballx, >=, $enemy, 9
+        // If the ball is within the target's x coordinates
+        if $xBall, <=, $tmp3, 12
+            if $xBall, >=, $enemy, 10
+                // Display white screen
                 set_clear $WHITE
                 clear
                 display
                 sleep 500
                 set_clear 0
+
+                // Starts a new game
                 set name, AFTER2
-                goto RESETGAME
+                goto RESET_GAME
                 #AFTER2:
-
-
-
-
-
 
 goto AFTER_BALL
 
-
-#RESETGAME:
+#RESET_GAME:
+    // Sets player position
     set panel, 30
-    set ballx, 105
-    set bally, 59
+    // Set ball properties
+    set xBall, 105
+    set yBall, 59
+    set xVel, -1
+    set yvel, -1
 
-    set velx, -1
-    set vely, -1
-    rng enemywidth, 20, 30
-    set enemyshould, 209
-    op $enemyshould, -, $enemywidth
-    rng enemy, 3, $enemyshould 
+    // Randomly selects position for target
+    rng enemyWidth, 20, 30
+    set enemyShould, 209
+    op $enemyShould, -, $enemyWidth
+    rng enemy, 3, $enemyShould 
     rng enemyY, 4, 10 
 
 goto $name
 
-#GAMEOVER:
+// End of game
+#GAME_OVER:
