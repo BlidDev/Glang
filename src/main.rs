@@ -71,13 +71,6 @@ fn main() {
     add_command(&mut globals.query, &mut globals.arg_numbers, "reset", reset,0);
     add_command(&mut globals.query, &mut globals.arg_numbers, "sleep", sleep,1);
     add_command(&mut globals.query, &mut globals.arg_numbers, "rng", rng,3);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "badduck", badduck,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "dorbell", dorbell,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "astrosam", astrosam,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "zayther", zayther,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "ovid", ovid,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "blid", blid,0);
-
 
     // Loop variables
     let file = File::open(path).unwrap();
