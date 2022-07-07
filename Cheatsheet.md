@@ -111,7 +111,7 @@ I highly suggest to also check out some of examples in the ``examples`` in order
     * `==`: Equals to
     * `!=`: Not equal to
 * `num2`: Right value (literal or variable)
-* `scope range`: Specifies the length of the condition's scope  (integer literal or variable's value)
+* `scope range`: Specifies the length of the condition's scope (integer literal or variable's value), including the statement itself.
 
 **Example**: `if $var, <=, 10, 4`
 
