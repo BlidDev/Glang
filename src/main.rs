@@ -1,10 +1,12 @@
-// Modules
+// Helper modules
 mod graphics;
-mod commands;
 mod memory;
 
+// Command modules
+mod commands;
+
+
 // Includes
-use commands::*;
 use device_query::DeviceState;
 use memory::*;
 use graphics::*;
@@ -14,6 +16,15 @@ use std::env;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
+// Command includes
+use commands::{
+    printing::*,
+    variables::*,
+    con_and_nav::*,
+    graphics_and_input::*,
+    miscellaneous::*,
+    easter_eggs::*,
+};
 
 /*
     `fn main()` will handle the following:
