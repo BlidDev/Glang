@@ -1,3 +1,4 @@
+// Includes
 use std::{mem::discriminant, process::exit, thread, time};
 use crate::memory::{get_var, is_variable, parse_variable, run, Args, Globals, Types, Stack};
 use beryllium::event::Event;
@@ -6,25 +7,33 @@ use rand::{thread_rng, Rng};
 use unescape::unescape;
 
 
+/*=====================*/
+/*  Printing Commands* */  
+/*=====================*/
+
+// Prints the line "alive!"
 pub fn alive(_: &mut Globals, _: Args) {
     println!("alive!");
 }
+// Prints out the command ptr variable
 pub fn cursor(globals: &mut Globals, _: Args)
 { 
      
      println!("{}",globals.cursor);
 }
 
+// Prints out plain text
 pub fn print(_: &mut Globals, args: Args) {
     
     let s = args.unwrap()[0].clone();
     print!("{}", unescape(&s).expect("ERR: Print value invalid"));
 }
 
+// Prints out the whole stack
 pub fn post(globals: &mut Globals, _: Args) {
     println!("{:#?}", globals.stack);
 }
-
+// Prints out a `set` variable
 pub fn out(globals: &mut Globals, _args: Args) {
     let value = _args.unwrap()[0].clone();
     match get_var(&globals.stack,&value) {
@@ -35,7 +44,11 @@ pub fn out(globals: &mut Globals, _args: Args) {
     }
 }
 
+/*=====================*/
+/*  Variable commands  */
+/*=====================*/
 
+// Set a new variable
 pub fn set(globals: &mut Globals, args: Args) {
     let name = args.as_ref().unwrap()[0].clone();
     let str_value = args.as_ref().unwrap()[1].as_str();
@@ -54,7 +67,7 @@ pub fn set(globals: &mut Globals, args: Args) {
     }
 }
 
-
+// Free the variable from the stack
 pub fn release(globals: &mut Globals, args: Args)
 {
     let str_value = &args.as_ref().unwrap()[0];
@@ -68,20 +81,14 @@ pub fn release(globals: &mut Globals, args: Args)
         panic!("ERR: Can not release, [{}] is not a variable",str_value);
     }
 }
+
+// Resets the entire stack
 pub fn reset(globals: &mut Globals, _: Args)
 {
     globals.stack = Stack::new();
 }
 
-pub fn sleep(globals: &mut Globals, args: Args)
-{
-    if let Types::I32(mut millis) = get_var(&globals.stack, &args.as_ref().unwrap()[0]) {
-        millis = millis.max(0); 
-        let time = time::Duration::from_millis(millis as u64);
-        thread::sleep(time)
-    }
-}
-
+// Generates a random number of a given range
 pub fn rng(globals: &mut Globals, args: Args)
 {
     let name = get_var(&globals.stack, &args.as_ref().unwrap()[0]);
@@ -117,8 +124,12 @@ pub fn rng(globals: &mut Globals, args: Args)
     }
 }
 
+/*=====================*/
+/*     Conditions &    */  
+/*     Navigations     */
+/*=====================*/
 
-
+// Jumps to a label
 pub fn goto(globals: &mut Globals, args: Args) {
     let label_name = get_var(&globals.stack, &args.as_ref().unwrap()[0]);
     if let Types::STR(label_name) = label_name {
@@ -129,6 +140,10 @@ pub fn goto(globals: &mut Globals, args: Args) {
     }
 }
 
+// Please fix this later
+// Used in `if` statements
+// Checks the two given types and determines
+// if the statement is true or false
 pub fn statement(first: &Types, second: &Types, op: &str) -> bool {
     if let (Types::I32(a), Types::I32(b)) = (first, second) {
         match op {
@@ -179,6 +194,7 @@ pub fn statement(first: &Types, second: &Types, op: &str) -> bool {
     }
 }
 
+// Checks if the given statement is true
 pub fn if_keyword(globals: &mut Globals, args: Args) {
         
     let first = get_var(&mut globals.stack, &args.as_ref().unwrap()[0]);
@@ -209,7 +225,7 @@ pub fn if_keyword(globals: &mut Globals, args: Args) {
     }
 }
 
-
+// Checks if a specified key is held down
 pub fn if_key(globals: &mut Globals, args: Args) {
     let key = get_var(&mut globals.stack, &args.as_ref().unwrap()[0]);
     let range = get_var(&mut globals.stack, &args.as_ref().unwrap()[1]);
@@ -239,6 +255,7 @@ pub fn if_key(globals: &mut Globals, args: Args) {
     }
 }
 
+// Performs arithmetic
 pub fn op(globals: &mut Globals, _args: Args) {
     let args = _args.unwrap().clone();
     let second = get_var(&globals.stack, &args[2]);
@@ -275,6 +292,14 @@ pub fn op(globals: &mut Globals, _args: Args) {
     }
 }
 
+
+
+/*=====================*/
+/*      Graphics &     */  
+/*    Input Handling   */
+/*=====================*/
+
+// Initializes a new canvas (window)
 pub fn init(globals: &mut Globals, args: Args)
 {
      
@@ -291,33 +316,7 @@ pub fn init(globals: &mut Globals, args: Args)
      }
 }
 
-
-pub fn int_to_rgb(color : i32)->(u8,u8,u8)
-{
-     return (((color>>16)& 0xFF) as u8,((color>>8)& 0xFF) as u8,((color)& 0xFF) as u8)
-}
-
-pub fn rgb_to_int(color : (u8,u8,u8))-> i32
-{
-    let mut i = color.0 as i32;
-    i = (i<<8)  + color.1 as i32;
-    i = (i<<8)  + color.2 as i32;
-
-    return i;
-}
-
-fn set_pixel(buffer : &mut [u8], index : usize, color : &[u8;4])
-{
-     buffer.chunks_exact_mut(4).nth(index).expect("ERR: Pixel index is out of range").copy_from_slice(color);
-}
-
-fn is_inited(is_inited : bool, command : &str)
-{
-     if !is_inited {
-          panic!("ERR: Trying to call graphical command [{}] but graphics is not initialized",command)
-     }
-}
-
+// Places a colored pixel at given coordinates
 pub fn put(globals: &mut Globals, args: Args) {
     is_inited(globals.graphics.is_inited, "put");
 
@@ -335,6 +334,7 @@ pub fn put(globals: &mut Globals, args: Args) {
     }
 }
 
+// Fills a given area in the canvas with colored pixels
 pub fn area(globals: &mut Globals, args: Args) 
 {
     is_inited(globals.graphics.is_inited, "area");
@@ -361,7 +361,7 @@ pub fn area(globals: &mut Globals, args: Args)
 
 }
 
-
+// Gets the pixel color at given coordinates
 pub fn get(globals: &mut Globals, args: Args) 
 {
      is_inited(globals.graphics.is_inited, "get");
@@ -382,6 +382,8 @@ pub fn get(globals: &mut Globals, args: Args)
         
     }
 }
+
+// Updates the display
 pub fn display(globals: &mut Globals, _: Args)
 {
      is_inited(globals.graphics.is_inited, "display");
@@ -390,6 +392,7 @@ pub fn display(globals: &mut Globals, _: Args)
      
 }
 
+// Sets the background color for `clear`
 pub fn set_clear(globals: &mut Globals, args: Args)
 {
     is_inited(globals.graphics.is_inited, "set_clear");
@@ -401,32 +404,14 @@ pub fn set_clear(globals: &mut Globals, args: Args)
     }
 }
 
+// Clears the canvas
 pub fn clear(globals: &mut Globals, _: Args)
 {
      is_inited(globals.graphics.is_inited, "clear");
      globals.graphics.pixels.as_mut().unwrap().get_frame().copy_from_slice(globals.graphics.cleanup_buffer.as_slice());
 }
 
-
-pub fn handle_events(globals: &mut Globals, _: Args)
-{
-    is_inited(globals.graphics.is_inited, "handle_input");
-    globals.keys = vec![];
-    while let Some(event) = globals.graphics.sdl_context.as_ref().unwrap().poll_event() {
-          match event {
-               Event::Quit { .. }=> exit(0),
-
-                Event::WindowResized { width, height, .. } => globals.graphics.pixels.as_mut().unwrap().resize_surface(width, height),
-                Event::Keyboard {..} => {globals.keys = globals.keyboard.get_keys()},
-                _=>(),
-          }
-     }
-     
-     
-     
-}
-
-
+// Resizes the window
 pub fn resize(globals: &mut Globals, args: Args)
 {
     is_inited(globals.graphics.is_inited, "resize");
@@ -458,7 +443,38 @@ pub fn resize(globals: &mut Globals, args: Args)
 
 }
 
+// Handles events, such as keyboard input and graphical changes
+pub fn handle_events(globals: &mut Globals, _: Args)
+{
+    is_inited(globals.graphics.is_inited, "handle_input");
+    globals.keys = vec![];
+    while let Some(event) = globals.graphics.sdl_context.as_ref().unwrap().poll_event() {
+          match event {
+               Event::Quit { .. }=> exit(0),
 
+                Event::WindowResized { width, height, .. } => globals.graphics.pixels.as_mut().unwrap().resize_surface(width, height),
+                Event::Keyboard {..} => {globals.keys = globals.keyboard.get_keys()},
+                _=>(),
+          }
+    }
+}
+
+
+/*=====================*/
+/*    Miscellaneous    */  
+/*=====================*/
+
+// Makes the thread pause for a given amount of milliseconds
+pub fn sleep(globals: &mut Globals, args: Args)
+{
+    if let Types::I32(mut millis) = get_var(&globals.stack, &args.as_ref().unwrap()[0]) {
+        millis = millis.max(0); 
+        let time = time::Duration::from_millis(millis as u64);
+        thread::sleep(time)
+    }
+}
+
+// Quits the program
 pub fn exit_command(globals: &mut Globals, args: Args)
 {
     if let Types::I32(code) = get_var(&globals.stack, &args.as_ref().unwrap()[0])
@@ -466,6 +482,52 @@ pub fn exit_command(globals: &mut Globals, args: Args)
         exit(code);
     }
 }
+
+/*====================*/
+/*  Public Functions  */  
+/*====================*/
+
+/* 
+    RGB-INT Converters
+*/
+pub fn int_to_rgb(color : i32)->(u8,u8,u8)
+{
+     return (((color>>16)& 0xFF) as u8,((color>>8)& 0xFF) as u8,((color)& 0xFF) as u8)
+}
+pub fn rgb_to_int(color : (u8,u8,u8))-> i32
+{
+    let mut i = color.0 as i32;
+    i = (i<<8)  + color.1 as i32;
+    i = (i<<8)  + color.2 as i32;
+
+    return i;
+}
+
+
+
+/*=====================*/
+/*   Local Functions   */  
+/*=====================*/
+
+// Sets the pixel color at given index
+fn set_pixel(buffer : &mut [u8], index : usize, color : &[u8;4])
+{
+     buffer.chunks_exact_mut(4).nth(index).expect("ERR: Pixel index is out of range").copy_from_slice(color);
+}
+
+// Checks if initialized
+fn is_inited(is_inited : bool, command : &str)
+{
+     if !is_inited {
+          panic!("ERR: Trying to call graphical command [{}] but graphics is not initialized",command)
+     }
+}
+
+
+/*======================*/
+/*        Credits       */
+/*======================*/
+
 
 
 pub fn badduck(_: &mut Globals, _: Args)

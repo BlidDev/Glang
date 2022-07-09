@@ -78,7 +78,6 @@ fn main() {
     add_command(&mut globals.query, &mut globals.arg_numbers, "ovid", ovid,0);
     add_command(&mut globals.query, &mut globals.arg_numbers, "blid", blid,0);
 
-
     // Loop variables
     let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
