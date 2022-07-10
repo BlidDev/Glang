@@ -9,7 +9,6 @@ pub type Args = Option<Vec<String>>;
 pub type Query = HashMap<String, fn(&mut Globals, Args)>;
 pub type Stack = HashMap<String, Types>;
 
-
 pub struct Globals {
     pub query: Query,
     pub arg_numbers : HashMap<String,i32>,

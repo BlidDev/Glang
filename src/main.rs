@@ -1,6 +1,7 @@
 // Helper modules
 mod graphics;
 mod memory;
+mod macros;
 
 // Command modules
 mod commands;
@@ -56,38 +57,8 @@ fn main() {
         keys : vec![]
     };
     
-    // List of commands
-    // Please for the love of everything holy, fix this
-    add_command(&mut globals.query, &mut globals.arg_numbers, "alive", alive,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "cursor", cursor,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "print", print,1);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "put", put,3);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "set", set,2);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "post", post,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "out", out,1);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "goto", goto,1);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "if", if_keyword,4);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "ifkey", if_key,2);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "op", op,3);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "init", init,4);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "display", display,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "set_clear", set_clear,1);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "clear", clear,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "handle_input", handle_events,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "area", area,5);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "get", get,3);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "resize", resize,2);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "exit", exit_command,1);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "release", release,1);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "reset", reset,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "sleep", sleep,1);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "rng", rng,3);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "badduck", badduck,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "dorbell", dorbell,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "astrosam", astrosam,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "zayther", zayther,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "ovid", ovid,0);
-    add_command(&mut globals.query, &mut globals.arg_numbers, "blid", blid,0);
+    add_commands(&mut globals);
+
 
     // Loop variables
     let file = File::open(path).unwrap();
@@ -150,6 +121,45 @@ fn main() {
     }
 }
 
+
+fn add_commands(globals : &mut Globals)
+{
+    commands![
+        (globals.query, globals.arg_numbers),
+        {
+            alive =>( alive,0),
+            print =>( print,1),
+            cursor =>( cursor,0),
+            set =>( set,2),
+            put =>( put,3),
+            out =>( out,1),
+            post =>( post,0),
+            if =>( if_keyword,4),
+            goto =>( goto,1),
+            op =>( op,3),
+            ifkey =>( if_key,2),
+            display =>( display,0),
+            init =>( init,4),
+            clear =>( clear,0),
+            set_clear =>( set_clear,1),
+            area =>( area,5),
+            handle_input =>( handle_events,0),
+            resize =>( resize,2),
+            get =>( get,3),
+            release =>( release,1),
+            exit =>( exit_command,1),
+            sleep =>( sleep,1),
+            reset =>( reset,0),
+            badduck =>( badduck,0),
+            rng =>( rng,3),
+            astrosam =>( astrosam,0),
+            dorbell =>( dorbell,0),
+            ovid =>( ovid,0),
+            zayther =>( zayther,0),
+            blid =>( blid,0),
+        }
+    ];
+}
 
  
 

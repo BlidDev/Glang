@@ -6,6 +6,7 @@ use beryllium::{
 };
 use zstring::zstr;
 
+
 pub struct Graphics {
     pub is_inited: bool,
     pub window_size: (i32, i32),
